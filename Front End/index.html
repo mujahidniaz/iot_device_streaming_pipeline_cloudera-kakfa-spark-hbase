@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SAAS Client</title>
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="css/css-custom.css" rel="stylesheet" id="bootstrap-css">
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="js/js-custom.js" ></script>
+</head>
+<body>
+<div class="container">
+    <div class="row" style="margin-top: 2% ;text-align: center; ">
+    <h1>Query IOT Data from HBase using Impala</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+            <table width="100%" class="table table-responsive table-bordered table-striped">
+                <tr>
+                    <th>Database Name</th>
+                    <th>Table Name</th>
+                    <th>Columns</th>
+                </tr>
+                <tr>
+                    <td>iot_hbase_impala</td>
+                    <td>hbase_iot_data_points</td>
+                    <td>rowID STRING |  deviceId STRING |  latitude INT | longitude INT |  temperature INT |  time TIMESTAMP | jsonstring STRING</td>
+                    
+                </tr>
+    
+            </table>
+            </div>
+            </div>
+    </div>
+    <div class="row" style="margin-top: 2%">
+        <div class="row">
+            <div class="row text-center">
+                <div class="col-md-10 col-md-offset-1">
+            <form class="form-inline mr-auto">
+              <input id='user_query' class="form-control" type="text" placeholder="Type your query here.." aria-label="Search" style="width:70%">
+              <button class="btn btn-primary btn-rounded btn-md my-0 ml-md-4" type="button" style="width: 29%" onclick="SendPost()"  >Execute</button>
+            </form>
+                </div>
+            </div>
+         </div>
+         <div class="row" style="margin-top: 2%">
+            <table id="result_table" class="table table-bordered table-striped">
+                
+            </table>
+         </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+function SendPost()
+{
+    
+var usr_query={"query": $("#user_query").val()}
+console.log(JSON.stringify( usr_query));
+usr_query=JSON.stringify( usr_query)
+try
+{
+jQuery.ajax({
+          url: "http://localhost:9898/query",
+          type: "POST",
+          data: usr_query,
+          contentType: 'application/json',
+          mode:"no-cors",
+          success: function(result) {
+        constructTable("#result_table",result);
+         console.log(result);
+          }
+});
+}
+catch(e)
+{
+    console.log("Error")
+    $("#result_table").val(e);   
+}
+}
+
+function constructTable(selector,list) { 
+
+   try
+   {
+    $(selector).empty();
+              // Getting the all column names 
+              var cols = Headers(list, selector);   
+     
+              // Traversing the JSON data 
+              for (var i = 0; i < list.length; i++) { 
+                  var row = $('<tr/>');    
+                  for (var colIndex = 0; colIndex < cols.length; colIndex++) 
+                  { 
+                      var val = list[i][cols[colIndex]]; 
+                        
+                      // If there is any key, which is matching 
+                      // with the column name 
+                      if (val == null) val = "";   
+                          row.append($('<td/>').html(val)); 
+                  } 
+                    
+                  // Adding each row to the table 
+                  $(selector).append(row); 
+              } 
+      }
+      catch(e)
+      {
+          console.log("Error")
+      }
+    
+    } 
+            
+          function Headers(list, selector) { 
+              var columns = []; 
+              var header = $('<tr/>'); 
+                
+              for (var i = 0; i < list.length; i++) { 
+                  var row = list[i]; 
+                    
+                  for (var k in row) { 
+                      if ($.inArray(k, columns) == -1) { 
+                          columns.push(k); 
+                            
+                          // Creating the header 
+                          header.append($('<th/>').html(k)); 
+                      } 
+                  } 
+              } 
+                
+              // Appending the header to the table 
+              $(selector).append(header); 
+                  return columns; 
+          } 
+
+</script>
+</body>
+</html>
