@@ -1,15 +1,15 @@
-# IOT Device Streaming Data Pipelines
-<br/>(Kafka + Hadoop(Cloudera) + Spark Structured Streaming + HBase + Impala)
+﻿# IOT Device Streaming Data Pipelines
+<br/># (Kafka + Hadoop (Cloudera) + Spark Structured Streaming + HBase + Impala) #
 
 ## Technologies:
 
 •	Kafka 								•	HBase
 
-•	ZooKeeper							•	Impala
+•	Zookeeper							•	Impala
 
 •	Hadoop (Cloudera)						•	Java EE
 
-•	Spark Structred streaming 					•	RestAPI
+•	Spark Structured streaming 					•	Rosati
 
 •	Nodejs                                      •   Scala
 
@@ -17,7 +17,7 @@
 
 ## Introduction:
 
-This application deals with streaming data from multiple IOTs. Each IOT is sending data constantly with the frequency of 1 second. In this application I have build a streaming pipeline that robustly moves that streaming data into our Haodoop stystem after transformation done in real time
+This application deals with streaming data from multiple IOTs. Each IOT is sending data constantly with the frequency of 1 second. In this application I have built a streaming pipeline that robustly moves that streaming data into our Hadoop system after transformation done in real time
 This has 4 different parts
 
 - Data Generation
@@ -33,14 +33,14 @@ Goal of this application is to develop a robust and efficient data pipeline that
 
 ### Data Generation:
 
-Fist step of this pipelines is to generate data which basically is simulating the IOTs which will be sending data to the pipeline. For simulation I have created a java application. Wich takes Data from weather APIs (Due to limited number of API Calls allowed by the **Weather APIs** I have rather parsed the google search page for weather and coordinate info ). This applicaton takes name of the city, then takes coordinates data from **Google Search** and parses the coordiates and then every **30 minutes** it updates the weather info from Google. And keeps sending data every second the **POST API** in **JSON** format. You can run **Multiple Instances** of this application to simulate more IOTs, every instance of this application works as an Indipendant IOT. You can add up to 1000s of these instances.
+First step of this pipelines is to generate data which basically is simulating the IOTs which will be sending data to the pipeline. For simulation I have created a java application. Witch takes Data from weather APIs (Due to limited number of API Calls allowed by the **Weather APIs** I have rather parsed the google search page for weather and coordinate info). This application takes name of the city, then takes coordinates data from **Google Search** and parses the coordinates and then every **30 minutes** it updates the weather info from Google. And keeps sending data every second the **POST API** in **JSON** format. You can run **Multiple Instances** of this application to simulate more IOTs, every instance of this application works as an Independent IOT. You can add up to 1000s of these instances.
 
 
 ### Data Ingestion:
-Second step of this pipeline is to ingest IOTs data into the data pipeline as fast as we can so API end point is receiving multiple concurrent POST requests every second processing data before pushing it to pipelines at this stage would be a bad design decission so I pushed it to **Apache KAFKA**. Which can handle Millions of reads and writes per second so all the parallel API requests are basically doing nothing but pushing posted data to Apache Kafka. Apache Kafka can be used in a cluster with Zookeeper to utilize distributed evironment.
+Second step of this pipeline is to ingest IOTs data into the data pipeline as fast as we can so API end point is receiving multiple concurrent POST requests every second processing data before pushing it to pipelines at this stage would be a bad design decision, so I pushed it to **Apache KAFKA**. Which can handle Millions of reads and writes per second, so all the parallel API requests are basically doing nothing but pushing posted data to Apache Kafka. Apache Kafka can be used in a cluster with Zookeeper to utilize distributed environment.
 
 ### Data Transformation:
-Third and most important step is to transfrom the data while its coming before storing it to the the destination storage. This part is tricky because data is coming in the form of stream, Traditional approach will not be any of the use here because of the streaming. So **SPARK** is the best choice here because **SPARK Streaming** allows us to apply transformations and computations on streaming data very fast and efficient. There were two choices here either i could go for **SPARK Streaming** or **SPARK Structured Streaming**. Whats the difference ? Spark Streaming works on something we call a **micro batch**. The stream pipeline is registered with some operations and Spark polls the source after every batch duration (defined in the application) and then a batch is created of the received data, i.e. each incoming record belongs to a batch of DStream. Each batch represents an RDD. But in case of Structured Streaming, there is no batch concept. The received data in a trigger is appended to the continuously flowing data stream. Each row of the data stream is processed and the result is updated into the unbounded result table. How you want your result (updated, new result only, or all the results) depends on the mode of your operations (Complete, Update, Append)
+Third and most important step is to transform the data while its coming before storing it to the destination storage. This part is tricky because data is coming in the form of stream, Traditional approach will not be any of the use here because of the streaming. So **SPARK** is the best choice here because **SPARK Streaming** allows us to apply transformations and computations on streaming data very fast and efficient. There were two choices here either i could go for **SPARK Streaming** or **SPARK Structured Streaming**. Whats the difference ? Spark Streaming works on something we call a **micro batch**. The stream pipeline is registered with some operations and Spark polls the source after every batch duration (defined in the application) and then a batch is created of the received data, i.e. each incoming record belongs to a batch of DStream. Each batch represents an RDD. But in case of Structured Streaming, there is no batch concept. The received data in a trigger is appended to the continuously flowing data stream. Each row of the data stream is processed and the result is updated into the unbounded result table. How you want your result (updated, new result only, or all the results) depends on the mode of your operations (Complete, Update, Append)
 
 ### Data Loading:
 Fourth step is to load the transformed data into some structured storage so that it can be queried, But writing a streaming data is tricky because due to contineous streams there will be a lot of transactions a lots of writes. In case of SQL Databases which acquire locks while writing. multiple writes will become really slow and is not practical. We need something which can handle that large amount of transactional rate without slowing down the whole process and can allow concurrent reads and writes. Apache **HBASE** is a **NO SQL** database which can handle these kind of situation very efficiently and the good thing is its compatible with SPARK. We can directly write streaming data from Spark to HBASE as soon as it comes and gets transformed. You have to write your own EACH ROW Writer for the HBASE to enable SPARK to communicate with HBASE. I used HBASE to store data in column oriented NO SQL database.
