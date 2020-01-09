@@ -1,8 +1,6 @@
-﻿# IOT Device Streaming Data Pipelines# 
-
+﻿# IOT Device Streaming Data Pipelines 
 <br/>
-
-# (Kafka + Hadoop (Cloudera) + Spark Structured Streaming + HBase + Impala) #
+ (Kafka + Hadoop (Cloudera) + Spark Structured Streaming + HBase + Impala) #
 
 ## Technologies:
 
