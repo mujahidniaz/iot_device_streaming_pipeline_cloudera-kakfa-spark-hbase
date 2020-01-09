@@ -2,7 +2,7 @@
 
 <br/>
 
-# (Kafka + Hadoop (Cloudera) + Spark Structured Streaming + HBase + Impala) #
+## (Kafka + Hadoop (Cloudera) + Spark Structured Streaming + HBase + Impala) ##
 
 ## Technologies:
 
