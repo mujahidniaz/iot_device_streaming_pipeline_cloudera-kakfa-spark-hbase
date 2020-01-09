@@ -1,5 +1,5 @@
 # IOT Device Streaming Data Pipelines
-(Kafka + Hadoop(Cloudera) + Spark Structured Streaming + HBase + Impala)
+<br/>(Kafka + Hadoop(Cloudera) + Spark Structured Streaming + HBase + Impala)
 
 ## Technologies:
 
@@ -62,27 +62,27 @@ Fifth and last step of the pipeplines to acess the data from the storage to use 
 -  	Replace the 'KAFKA_HOST' value with IP Address in Kafka_EndPoint_API->server.js & Kafka_EndPoint_API->Create_Topics.js
 - 	Run the 'Run_Kafka_End_Point.bat' file. which will create the topic and will start the Rest API End point for Kafka.
 - 	Run 3 instances of IOT_Simulator which will ask for location and you can provide any city name it will pick up the City Coordinates and Temprature on its own by crawling and parsing google search.
-- 	create HBase table using HBase shell (type HBase Shell in cmd) to access Hbase shell.
+- 	create HBase table using HBase shell (type `HBase Shell` in cmd) to access Hbase shell.<br/>
 
-`create 'IOT_Data_Points','deviceId','temperature','location','time','jsonstring'`
+`create 'IOT_Data_Points','deviceId','temperature','location','time','jsonstring'`<br/>
 
-- 	Now create hive table using hive shell (Type Hive in cmd) to access Hive shell and create Hive table using following command.
+- 	Now create hive table using hive shell (Type `Hive` in cmd) to access Hive shell and create Hive table using following command.
 
-    `CREATE EXTERNAL TABLE hbase_iot_data_points (rowID STRING, deviceId STRING, latitude INT,longitude INT, temperature INT, time TIMESTAMP,jsonstring STRING) 
+    <br/>`CREATE EXTERNAL TABLE hbase_iot_data_points (rowID STRING, deviceId STRING, latitude INT,longitude INT, temperature INT, time TIMESTAMP,jsonstring STRING) 
     STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' 
     WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key,deviceId:deviceId,location:latitude,location:longitude,temperature:temperature,time:time,jsonstring:jsonstring") 
-    TBLPROPERTIES("hbase.table.name" = "IOT_Data_Points");`
+    TBLPROPERTIES("hbase.table.name" = "IOT_Data_Points");`<br/>
 
-- 	Now update impala metadata so that you can query HBase table from impala using following command
-		invalidate metadata hbase_iot_data_points;
+- 	Now login to IMPALA shell using command `impala-shell` update impala metadata so that you can query HBase table from impala using following command
+		<br/>`invalidate metadata hbase_iot_data_points;`<br/>
 
-- 	Create a jar file form the project 'SparkStructuredStreamingWithKafka' and copy it to some locatio on your VM using WinSCP.
+- 	Create a jar file form the project `SparkStructuredStreamingWithKafka` and copy it to some locatio on your VM using WinSCP.
 - 	Run Spark2-Submit job using following command by providing necessary dependencies and packages.
 
     `spark2-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.4,org.apache.spark:spark-streaming-kafka-0-10_2.11:2.4.4,org.apache.kafka:kafka-clients:2.4.0,org.apache.hbase :hbase-client:1.2.0,org.apache.hbase:hbase-common:1.2.0,org.apache.hbase:hbase-protocol:1.2.0  --class SparkApp --master local IOT_SPARK_STREAMING_HBASE_JOB.jar`
 
--  Finally Run the Impala-Shell to query the HBase table.
-- 	Alternatively you can run the 'Run_FrontEnd.bat' and the go to `http://localhost:9898` to use the front end web Interface for Habase and query data.
+-  Finally Run the `Impala-Shell` to query the HBase table like. `SELECT * FROM hbase_iot_data_points`
+- 	Alternatively you can run the 'Run_FrontEnd.bat' and the go to http://localhost:9898 to use the front end web Interface for Habase and query data.
 
 
 ## Demo Video 
